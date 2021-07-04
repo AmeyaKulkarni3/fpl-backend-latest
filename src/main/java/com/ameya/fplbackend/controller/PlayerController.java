@@ -79,7 +79,7 @@ public class PlayerController {
 		return returnValue;
 	}
 	
-	@DeleteMapping("/admin/{plyerId}")
+	@DeleteMapping("/admin/{playerId}")
 	public String deletePlayer(@PathVariable String playerId) {
 		
 		playerService.deletePlayerByPlayerId(playerId);

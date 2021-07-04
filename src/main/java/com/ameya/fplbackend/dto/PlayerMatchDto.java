@@ -16,6 +16,9 @@ public class PlayerMatchDto implements Serializable {
 	private LocalTime matchTime;
 	private String matchVenue;
 	private String result;
+	private int team1Count;
+	private int team2Count;
+	private int noNomination;
 	
 	public long getId() {
 		return id;
@@ -64,5 +67,23 @@ public class PlayerMatchDto implements Serializable {
 	}
 	public void setResult(String result) {
 		this.result = result;
+	}
+	public int getTeam1Count() {
+		return team1Count;
+	}
+	public void setTeam1Count(int team1Count) {
+		this.team1Count = team1Count;
+	}
+	public int getTeam2Count() {
+		return team2Count;
+	}
+	public void setTeam2Count(int team2Count) {
+		this.team2Count = team2Count;
+	}
+	public int getNoNomination() {
+		return noNomination;
+	}
+	public void setNoNomination(int noNomination) {
+		this.noNomination = noNomination;
 	}
 }

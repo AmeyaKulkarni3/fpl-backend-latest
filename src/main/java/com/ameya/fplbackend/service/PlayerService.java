@@ -18,4 +18,6 @@ public interface PlayerService extends UserDetailsService{
 	
 	void deletePlayerByPlayerId(String playerId);
 
+	void updatePoints(long id);
+
 }

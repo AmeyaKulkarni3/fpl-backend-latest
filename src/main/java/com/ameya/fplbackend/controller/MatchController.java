@@ -5,11 +5,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,6 +70,9 @@ public class MatchController {
 			matchRest.setTeam1(dto.getTeam1());
 			matchRest.setTeam2(dto.getTeam2());
 			matchRest.setMatchNominationRest(matchNominationRest);
+			matchRest.setTeam1Count(dto.getTeam1Count());
+			matchRest.setTeam2Count(dto.getTeam2Count());
+			matchRest.setNoNomination(dto.getNoNomination());
 			returnValue.add(matchRest);
 		}
 		
@@ -112,6 +117,9 @@ public class MatchController {
 		matchRest.setMatchTime(matchDto.getMatchTime());
 		matchRest.setMatchVenue(matchDto.getMatchVenue());
 		matchRest.setMatchNominationRest(nominationsRest);
+		matchRest.setTeam1Count(matchDto.getTeam1Count());
+		matchRest.setTeam2Count(matchDto.getTeam2Count());
+		matchRest.setNoNomination(matchDto.getNoNomination());
 		
 		return matchRest;
 	}
@@ -164,10 +172,39 @@ public class MatchController {
 		matchRest.setMatchTime(match.getMatchTime());
 		matchRest.setMatchVenue(match.getMatchVenue());
 		matchRest.setMatchNominationRest(nominationsRest);
+		matchRest.setTeam1Count(match.getTeam1Count());
+		matchRest.setTeam2Count(match.getTeam2Count());
+		matchRest.setNoNomination(match.getNoNomination());
 		
 		return matchRest;
 		
 	}
+	
+	@PutMapping("/{id}/{result}")
+	public MatchRest updateResult(@PathVariable long id,@PathVariable String result) {
+		
+		MatchDto matchDto = matchService.updateResult(id,result);
+		
+		ModelMapper modelMapper = new ModelMapper();
+		
+		MatchRest returnValue = modelMapper.map(matchDto, MatchRest.class);
+		
+		return returnValue;
+	}
+	
+	@PutMapping("/update-count/{date}")
+	public String updateTeamCount(@PathVariable String date) {
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
+		
+		LocalDate matchDate = LocalDate.parse(date,formatter);
+		
+		matchService.updateTeamCount(matchDate);
+		
+		return "Count updated Successfully.";
+	}
+		
+	
 	
 
 }

@@ -27,6 +27,9 @@ public class MatchEntity {
 	private LocalTime matchTime;
 	private String matchVenue;
 	private String result;
+	private int team1Count;
+	private int team2Count;
+	private int noNomination;
 	
 	@OneToMany(mappedBy="match",cascade = CascadeType.PERSIST)
 	private List<NominationEntity> nominations;
@@ -36,7 +39,7 @@ public class MatchEntity {
 	}
 	
 	public MatchEntity(int matchNumber, String team1, String team2, LocalDate matchDate, LocalTime matchTime,
-			String matchVenue, String result, List<NominationEntity> nominations) {
+			String matchVenue, String result, int team1Count, int team2Count, int noNomination, List<NominationEntity> nominations) {
 		this.matchNumber = matchNumber;
 		this.team1 = team1;
 		this.team2 = team2;
@@ -45,6 +48,9 @@ public class MatchEntity {
 		this.matchVenue = matchVenue;
 		this.result = result;
 		this.nominations = nominations;
+		this.team1Count = team1Count;
+		this.team2Count = team2Count;
+		this.noNomination = noNomination;
 	}
 
 	public long getId() {
@@ -117,6 +123,30 @@ public class MatchEntity {
 
 	public void setNominations(List<NominationEntity> nominations) {
 		this.nominations = nominations;
+	}
+
+	public int getTeam1Count() {
+		return team1Count;
+	}
+
+	public void setTeam1Count(int team1Count) {
+		this.team1Count = team1Count;
+	}
+
+	public int getTeam2Count() {
+		return team2Count;
+	}
+
+	public void setTeam2Count(int team2Count) {
+		this.team2Count = team2Count;
+	}
+
+	public int getNoNomination() {
+		return noNomination;
+	}
+
+	public void setNoNomination(int noNomination) {
+		this.noNomination = noNomination;
 	}
 
 }

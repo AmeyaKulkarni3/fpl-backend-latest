@@ -31,23 +31,24 @@ public class PlayerPrinciple implements UserDetails {
 		if(roles == null) return authorities;
 		
 		roles.forEach((role) -> {
+			authorities.add(new SimpleGrantedAuthority(role.getName()));
 			authorityEntities.addAll(role.getAuthorities());
 		});
 		
 		authorityEntities.forEach((authorityEntity) -> {
 			authorities.add(new SimpleGrantedAuthority(authorityEntity.getName()));
 		});
-		return null;
+		return authorities;
 	}
 
 	@Override
 	public String getPassword() {
-		return playerEntity.getEncryptedPassword();
+		return this.playerEntity.getEncryptedPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		return playerEntity.getName();
+		return this.playerEntity.getName();
 	}
 
 	@Override

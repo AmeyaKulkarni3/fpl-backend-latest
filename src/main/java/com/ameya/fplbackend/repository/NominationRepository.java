@@ -14,5 +14,8 @@ public interface NominationRepository extends CrudRepository<NominationEntity, L
 	public List<NominationEntity> findByMatchId(long id);
 	public NominationEntity findByPlayerIdAndMatchId(long playerId,long matchId);
 //	public List<NominationEntity> getAllNominations(String playerId);
+	public void deleteByNominationId(long id);
+//	public void deleteAllByIds(List<PlayerEntity> players);
+	public List<NominationEntity> findAllByMatchId(long id);
 
 }

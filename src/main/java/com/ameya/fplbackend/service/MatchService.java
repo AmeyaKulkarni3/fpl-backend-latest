@@ -15,4 +15,8 @@ public interface MatchService {
 	
 	MatchDto getMatchById(long id);
 
+	MatchDto updateResult(long id, String result);
+	
+	void updateTeamCount(LocalDate date);
+
 }

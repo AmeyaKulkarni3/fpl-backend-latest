@@ -13,6 +13,9 @@ public class MatchRest {
 	private LocalTime matchTime;
 	private String matchVenue;
 	private String result;
+	private int team1Count;
+	private int team2Count;
+	private int noNomination;
 	private List<MatchNominationRest> matchNominationRest;
 
 	public int getMatchNumber() {
@@ -62,5 +65,23 @@ public class MatchRest {
 	}
 	public void setMatchNominationRest(List<MatchNominationRest> matchNominationRest) {
 		this.matchNominationRest = matchNominationRest;
+	}
+	public int getTeam1Count() {
+		return team1Count;
+	}
+	public void setTeam1Count(int team1Count) {
+		this.team1Count = team1Count;
+	}
+	public int getTeam2Count() {
+		return team2Count;
+	}
+	public void setTeam2Count(int team2Count) {
+		this.team2Count = team2Count;
+	}
+	public int getNoNomination() {
+		return noNomination;
+	}
+	public void setNoNomination(int noNomination) {
+		this.noNomination = noNomination;
 	}
 }

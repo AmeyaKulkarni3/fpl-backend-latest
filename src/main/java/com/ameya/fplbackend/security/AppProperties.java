@@ -13,5 +13,9 @@ public class AppProperties {
 	public String getTokenSecret() {
 		return env.getProperty("tokenSecret");
 	}
+	
+	public int getPlayerCount() {
+		return Integer.parseInt(env.getProperty("playerCount"));
+	}
 
 }

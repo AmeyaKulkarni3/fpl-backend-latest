@@ -11,5 +11,6 @@ public interface PlayerRepository extends CrudRepository<PlayerEntity, Long> {
 	PlayerEntity findByName(String name);
 	PlayerEntity findByPlayerId(String id);
 	PlayerEntity findById(long id);
+	void deleteById(long id);
 
 }

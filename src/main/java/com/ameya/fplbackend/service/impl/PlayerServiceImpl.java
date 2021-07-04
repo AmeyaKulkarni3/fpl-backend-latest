@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ameya.fplbackend.dto.MatchNominationDto;
 import com.ameya.fplbackend.dto.PlayerDto;
 import com.ameya.fplbackend.dto.PlayerMatchDto;
 import com.ameya.fplbackend.dto.PlayerNominationDto;
@@ -23,9 +24,12 @@ import com.ameya.fplbackend.entity.PlayerEntity;
 import com.ameya.fplbackend.entity.RoleEntity;
 import com.ameya.fplbackend.exception.RecordExistsException;
 import com.ameya.fplbackend.exception.ResourceNotFoundException;
+import com.ameya.fplbackend.repository.MatchRepository;
 import com.ameya.fplbackend.repository.PlayerRepository;
 import com.ameya.fplbackend.repository.RoleRepository;
 import com.ameya.fplbackend.security.PlayerPrinciple;
+import com.ameya.fplbackend.service.MatchService;
+import com.ameya.fplbackend.service.NominationService;
 import com.ameya.fplbackend.service.PlayerService;
 import com.ameya.fplbackend.shared.Utils;
 
@@ -44,6 +48,12 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Autowired
 	RoleRepository roleRepository;
+	
+	@Autowired
+	NominationService nominationService;
+	
+	@Autowired
+	MatchRepository matchRepsitory;
 
 	@Override
 	public PlayerDto createPlayer(PlayerDto player) {
@@ -126,6 +136,9 @@ public class PlayerServiceImpl implements PlayerService {
 			playerMatchDto.setResult(match.getResult());
 			playerMatchDto.setTeam1(match.getTeam1());
 			playerMatchDto.setTeam2(match.getTeam2());
+			playerMatchDto.setTeam1Count(match.getTeam1Count());
+			playerMatchDto.setTeam2Count(match.getTeam2Count());
+			playerMatchDto.setNoNomination(match.getNoNomination());
 			PlayerNominationDto playerNomDto = new PlayerNominationDto();
 			playerNomDto.setNomination(nomination.getNomination());
 			playerNomDto.setNominationId(nomination.getNominationId());
@@ -175,6 +188,8 @@ public class PlayerServiceImpl implements PlayerService {
 		
 		if(player == null) throw new ResourceNotFoundException("Player Not Found");
 		
+		nominationService.deleteAllById(player);		
+		
 		playerRepository.deleteById(player.getId());
 	}
 
@@ -183,6 +198,63 @@ public class PlayerServiceImpl implements PlayerService {
 	public PlayerDto getPlayerById(long id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	@Override
+	public void updatePoints(long id) {
+		List<MatchNominationDto> nominations = nominationService.getMatchNominations(id);
+		MatchEntity match = matchRepsitory.findById(id);
+		int team1Count = match.getTeam1Count();
+		int team2Count = match.getTeam2Count();
+		int noNomination = match.getNoNomination();
+		String result = match.getResult();
+		String team1 = match.getTeam1();
+		String team2 = match.getTeam2();
+		
+		for(MatchNominationDto dto : nominations) {
+			double points = 0;
+			PlayerEntity player = playerRepository.findById(dto.getMatchPlayerDto().getId());
+			if(noNomination == 0) {
+				if(dto.getNomination().equals(result)) {
+					if(result.equals(team1)) {
+						points = ((double)team2Count * 10)/((double)team1Count);
+					} else if(result.equals(team2)) {
+						points = ((double)team1Count * 10)/((double)team2Count);
+					}
+					
+				} else if(dto.getNomination().equals("DRAW")) {
+					points = 10;
+				} else {
+					points = -10;
+				}
+			} else {
+				if(result.equals(team1)) {
+					team2Count = team2Count + noNomination;
+				} else if(result.equals(team2)) {
+					team1Count = team1Count + noNomination;
+				}
+				if(dto.getNomination().equals(result)) {
+					if(result.equals(team1)) {
+						points = ((double)team2Count * 10)/((double)team1Count);
+					} else if(result.equals(team2)) {
+						points = ((double)team1Count * 10)/((double)team2Count);
+					}
+					
+				} else if(dto.getNomination().equals("DRAW")) {
+					points = 10;
+				} else {
+					points = -10;
+				}
+			}
+			
+			double newPoints = player.getPoints() + points;
+			player.setPoints(newPoints);
+			playerRepository.save(player);
+			
+		}
+				
+		
 	}
 
 }

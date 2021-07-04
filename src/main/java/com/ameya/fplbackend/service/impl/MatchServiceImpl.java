@@ -15,9 +15,11 @@ import com.ameya.fplbackend.dto.MatchPlayerDto;
 import com.ameya.fplbackend.entity.MatchEntity;
 import com.ameya.fplbackend.entity.NominationEntity;
 import com.ameya.fplbackend.entity.PlayerEntity;
+import com.ameya.fplbackend.exception.RecordExistsException;
 import com.ameya.fplbackend.exception.ResourceNotFoundException;
 import com.ameya.fplbackend.repository.MatchRepository;
 import com.ameya.fplbackend.service.MatchService;
+import com.ameya.fplbackend.service.PlayerService;
 
 @Service
 @Transactional
@@ -25,6 +27,9 @@ public class MatchServiceImpl implements MatchService {
 	
 	@Autowired
 	MatchRepository matchRepository;
+	
+	@Autowired
+	PlayerService playerService;
 
 	@Override
 	public MatchDto getMatch(LocalDate date) {
@@ -42,6 +47,9 @@ public class MatchServiceImpl implements MatchService {
 		matchDto.setResult(matchEntity.getResult());
 		matchDto.setTeam1(matchEntity.getTeam1());
 		matchDto.setTeam2(matchEntity.getTeam2());
+		matchDto.setTeam1Count(matchEntity.getTeam1Count());
+		matchDto.setTeam2Count(matchEntity.getTeam2Count());
+		matchDto.setNoNomination(matchEntity.getNoNomination());
 		List<MatchNominationDto> nominations = new ArrayList<>();
 		List<NominationEntity> entity = matchEntity.getNominations();
 		for(NominationEntity n : entity) {
@@ -101,6 +109,9 @@ public class MatchServiceImpl implements MatchService {
 			newMatch.setResult(match.getResult());
 			newMatch.setTeam1(match.getTeam1());
 			newMatch.setTeam2(match.getTeam2());
+			newMatch.setTeam1Count(match.getTeam1Count());
+			newMatch.setTeam2Count(match.getTeam2Count());
+			newMatch.setNoNomination(match.getNoNomination());
 
 			returnValue.add(newMatch);
 		}
@@ -139,6 +150,9 @@ public class MatchServiceImpl implements MatchService {
 		matchDto.setResult(match.getResult());
 		matchDto.setTeam1(match.getTeam1());
 		matchDto.setTeam2(match.getTeam2());
+		matchDto.setTeam1Count(match.getTeam1Count());
+		matchDto.setTeam2Count(match.getTeam2Count());
+		matchDto.setNoNomination(match.getNoNomination());		
 		List<MatchNominationDto> nominations = new ArrayList<>();
 		List<NominationEntity> entity = match.getNominations();
 		for(NominationEntity n : entity) {
@@ -161,6 +175,58 @@ public class MatchServiceImpl implements MatchService {
 		matchDto.setNominations(nominations);
 		
 		return matchDto;
+	}
+
+	@Override
+	public MatchDto updateResult(long id, String result) {
+		
+		MatchEntity matchEntity = matchRepository.findById(id);
+		
+		matchEntity.setResult(result);
+		
+		MatchEntity updatedMatch = matchRepository.save(matchEntity);
+		
+		ModelMapper modelMapper = new ModelMapper();
+		
+		MatchDto matchDto = modelMapper.map(updatedMatch, MatchDto.class);
+		
+		playerService.updatePoints(id);
+		
+		return matchDto;
+	}
+
+	@Override
+	public void updateTeamCount(LocalDate date) {
+
+		MatchEntity matchEntity = matchRepository.findByMatchDate(date);
+		
+		if(matchEntity.getTeam1Count() != 0 || matchEntity.getTeam2Count() != 0 || matchEntity.getNoNomination() != 0) {
+			throw new RecordExistsException("Record Already Exists");
+		}
+		
+		List<NominationEntity> nominations = matchEntity.getNominations();
+		
+		String team1 = matchEntity.getTeam1();
+		String team2 = matchEntity.getTeam2();
+		
+		int team1Count = 0;
+		int team2Count = 0;
+		int noNomination = 0;
+		for(NominationEntity nomination : nominations) {
+			if(nomination.getNomination().equals(team1)) {
+				team1Count++;
+			} else if(nomination.getNomination().equals(team2)) {
+				team2Count++;
+			} else {
+				noNomination++;
+			}
+		}
+		
+		matchEntity.setTeam1Count(team1Count);
+		matchEntity.setTeam2Count(team2Count);
+		matchEntity.setNoNomination(noNomination);
+		
+		matchRepository.save(matchEntity);
 	}
 
 }
